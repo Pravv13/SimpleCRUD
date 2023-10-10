@@ -10,16 +10,51 @@ const [inputNama, setinputNama] = useState('')
 const [inputNim, setInputNim] = useState('')
 const [inputMakul, setInputMakul] = useState('')
 const [id, setId] = useState(1)
-const handleCreate = () => {
-    if (inputNama.trim() === "" || inputNim.trim() === "" || inputMakul.trim() === ""){
-        alert('Harap Input Semua Data !');
-        return;
+const [isEditing, setIsEditing] = useState(false)
+const [editingItemId, setEditingItemId] = useState(null)
+const handleSave = () => {
+    if (isEditing){
+        setCreate((prevCreate) => {
+            return prevCreate.map((item) => {
+                if (item.id === editingItemId){
+                    return {id: editingItemId, text: inputNama, nim: inputNim, makul: inputMakul}
+                }
+                return item;
+            })
+        })
+        setEditingItemId(null);
+        setIsEditing(false);
+        setinputNama('');
+        setInputNim('');
+        setInputMakul('');
     }
-    setCreate([...create, {id, text: inputNama, nim: inputNim, makul: inputMakul}]);
+    else{
+        if (inputNama.trim() === "" || inputNim.trim() === "" || inputMakul.trim() === ""){
+            alert('Harap Input Semua Data !');
+            return;
+        }
+        setCreate([...create, {id, text: inputNama, nim: inputNim, makul: inputMakul}]);
+        setinputNama('');
+        setInputNim('');
+        setInputMakul('');
+        setId(id+1);
+    }
+    setIsEditing(false);
+}
+const handleEdit = (index) => {
+    const editedItem = create[index];
+    setinputNama(editedItem.text);
+    setInputNim(editedItem.nim);
+    setInputMakul(editedItem.makul);
+    setEditingItemId(editedItem.id);
+    setIsEditing(true);
+}
+const handleCancelEdit = () => {
     setinputNama('');
     setInputNim('');
     setInputMakul('');
-    setId(id+1);
+    setIsEditing(false);
+    setEditingItemId(null);
 }
 
 console.log({create})
@@ -51,7 +86,8 @@ console.log({create})
                 <option value="Statistika Data">Statistika Data</option>
             </select>
             <br></br><br></br>
-            <button onClick={handleCreate}>Tambah Data</button>
+            <button onClick={handleSave}>{isEditing ? 'Simpan Perubahan' : 'Tambah Data'}</button>
+            <button onClick={handleCancelEdit} style={{display: isEditing ? 'block' : 'none'}}>Batal</button>
             <h1></h1>
         </Card>
     {/* end input create */}
@@ -74,7 +110,7 @@ console.log({create})
                 <td>{item.text}</td>
                 <td>{item.nim}</td>
                 <td>{item.makul}</td>
-                <td><BiSolidEditAlt /></td>
+                <td><BiSolidEditAlt onClick={() => handleEdit(index)} /></td>
                 <td><MdDeleteOutline /></td>
             </tr>
       ))
