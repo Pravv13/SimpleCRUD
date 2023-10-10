@@ -2,14 +2,14 @@ import React, {useState} from 'react';
 import { Card } from 'react-bootstrap';
 import Table from 'react-bootstrap/Table';
 import { BiSolidEditAlt } from 'react-icons/bi';
-import { MdDeleteOutline } from 'react-icons/md'
+import { MdDeleteOutline } from 'react-icons/md';
+import { v4 as uuidv4 } from 'uuid';
 
 function Crud() {
 const [create, setCreate] = useState([])
 const [inputNama, setinputNama] = useState('')
 const [inputNim, setInputNim] = useState('')
 const [inputMakul, setInputMakul] = useState('')
-const [id, setId] = useState(1)
 const [isEditing, setIsEditing] = useState(false)
 const [editingItemId, setEditingItemId] = useState(null)
 const handleSave = () => {
@@ -33,11 +33,10 @@ const handleSave = () => {
             alert('Harap Input Semua Data !');
             return;
         }
-        setCreate([...create, {id, text: inputNama, nim: inputNim, makul: inputMakul}]);
+        setCreate([...create, {id: uuidv4(), text: inputNama, nim: inputNim, makul: inputMakul}]);
         setinputNama('');
         setInputNim('');
         setInputMakul('');
-        setId(id+1);
     }
     setIsEditing(false);
 }
@@ -56,7 +55,10 @@ const handleCancelEdit = () => {
     setIsEditing(false);
     setEditingItemId(null);
 }
-
+const handleDelete = (id) => {
+    const updatedCreate = create.filter((item) => item.id !== id);
+    setCreate(updatedCreate);
+}
 console.log({create})
   return (
     <div>
@@ -105,13 +107,13 @@ console.log({create})
       </thead>
       <tbody>
       {create.map((item, index) => (
-            <tr key={item}>
-                <td>{item.id}</td>
+            <tr key={item.id}>
+                <td>{index+1}</td>
                 <td>{item.text}</td>
                 <td>{item.nim}</td>
                 <td>{item.makul}</td>
                 <td><BiSolidEditAlt onClick={() => handleEdit(index)} /></td>
-                <td><MdDeleteOutline /></td>
+                <td><MdDeleteOutline onClick={() => handleDelete(item.id)}/></td>
             </tr>
       ))
       }
